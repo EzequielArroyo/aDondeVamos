@@ -1,13 +1,13 @@
-package com.github.ezequielarroyo.postmodule;
+package com.github.ezequielarroyo.postService;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-public class PostModuleApplication {
+public class PostServiceApplication {
 
     public static void main(String[] args) {
-        SpringApplication.run(PostModuleApplication.class, args);
+        SpringApplication.run(PostServiceApplication.class, args);
     }
 
 }

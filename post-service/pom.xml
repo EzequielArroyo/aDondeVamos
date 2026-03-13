@@ -9,7 +9,7 @@
         <relativePath/>
     </parent>
 
-    <artifactId>postModule</artifactId>
+    <artifactId>post-service</artifactId>
 
     <dependencies>
         <dependency>

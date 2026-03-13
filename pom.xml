@@ -21,7 +21,7 @@
   </properties>
 
   <modules>
-    <module>postModule</module>
+    <module>post-service</module>
   </modules>
 
 </project>
