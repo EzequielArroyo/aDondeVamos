@@ -6,7 +6,6 @@
         <groupId>com.github.ezequielarroyo</groupId>
         <artifactId>aDondeVamos</artifactId>
         <version>1.0-SNAPSHOT</version>
-        <relativePath/>
     </parent>
 
     <artifactId>post-service</artifactId>

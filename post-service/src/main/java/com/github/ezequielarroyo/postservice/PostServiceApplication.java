@@ -1,4 +1,4 @@
-package com.github.ezequielarroyo.postService;
+package com.github.ezequielarroyo.postservice;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
