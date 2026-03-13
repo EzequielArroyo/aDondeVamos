@@ -1,0 +1,42 @@
+@startuml
+Class Post{
+-UUID id
+-Boolean active
+-String title
+-Location location
+-LocalDateTime activityDate
+-Integer maxParticipants
+-PostStatus status
+-User owner
+-List<Participant> participants
+-Instant createdAt
+-Instant updatedAt
+-Instant deletedAt
++addParticipant(user)
++deleteParticipant(user)
+}
+Class Participant{
+-Integer id
+-Boolean active
+-Post post
+-user user
+-Instant joinedAt
+-Instant leftAt
+}
+Class User{
+-UUID id
+-username
+-avatar
+}
+Enum PostStatus{
+OPEN
+FULL
+CANCELLED
+FINISHED
+}
+Post "1" -- "*" Participant : has
+Post "*" -- "1" User : created_by
+Participant "*" -- "1" User : is_user
+Post --* PostStatus
+
+@enduml
