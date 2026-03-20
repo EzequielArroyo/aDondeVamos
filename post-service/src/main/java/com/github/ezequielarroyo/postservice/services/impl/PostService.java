@@ -1,6 +1,7 @@
 package com.github.ezequielarroyo.postservice.services.impl;
 
 import com.github.ezequielarroyo.postservice.dtos.input.PostCreateRequest;
+import com.github.ezequielarroyo.postservice.dtos.input.PostUpdateRequest;
 import com.github.ezequielarroyo.postservice.dtos.output.PostResponse;
 import com.github.ezequielarroyo.postservice.entities.Post;
 import com.github.ezequielarroyo.postservice.entities.User;
@@ -29,7 +30,7 @@ public class PostService implements IPostService {
     }
 
     @Override
-    public PostResponse save(PostCreateRequest request, UUID uuid) {
+    public PostResponse createPost(PostCreateRequest request, UUID uuid) {
         User owner = userService.findByUuid(uuid);
         Post post = Post.create(
                 request.title(),
@@ -44,12 +45,12 @@ public class PostService implements IPostService {
     }
 
     @Override
-    public PostResponse findByUuid(UUID uuid) {
+    public PostResponse getPostById(UUID uuid) {
         return postMapper.toDto(this.getPostByUuid(uuid));
     }
 
     @Override
-    public Page<PostResponse> findAll(Pageable pageable) {
+    public Page<PostResponse> getAllPosts(Pageable pageable) {
         Page<Post> posts = postRepository.findAll(pageable);
         return posts.map(postMapper::toDto);
     }
@@ -69,6 +70,14 @@ public class PostService implements IPostService {
         post.removeParticipant(user);
         postRepository.save(post);
     }
+
+    @Override
+    public PostResponse updatePost(UUID PostUuid, PostUpdateRequest request) {
+        Post post = this.getPostByUuid(PostUuid);
+        post.update(request.title(),request.location(),request.activityDate(),request.maxParticipants());
+        return postMapper.toDto(postRepository.save(post));
+    }
+
     private Post getPostByUuid(UUID uuid) {
         return postRepository.findByUuid(uuid)
                 .orElseThrow(()-> new EntityNotFoundException("Post not found with uuid: " + uuid));

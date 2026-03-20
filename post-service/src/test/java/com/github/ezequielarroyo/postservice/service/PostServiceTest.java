@@ -1,6 +1,7 @@
 package com.github.ezequielarroyo.postservice.service;
 
 import com.github.ezequielarroyo.postservice.dtos.input.PostCreateRequest;
+import com.github.ezequielarroyo.postservice.dtos.input.PostUpdateRequest;
 import com.github.ezequielarroyo.postservice.dtos.output.PostResponse;
 import com.github.ezequielarroyo.postservice.entities.Location;
 import com.github.ezequielarroyo.postservice.entities.Post;
@@ -19,6 +20,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
+
 import java.time.LocalDateTime;
 import java.util.Optional;
 import java.util.UUID;
@@ -46,11 +48,7 @@ class PostServiceTest {
         owner = createUser("owner");
         savedPost = createPost(owner);
     }
-
-    // =========================
-    // 🧪 SAVE
-    // =========================
-
+    //SAVE
     @Test
     @DisplayName("Should save post and return mapped response")
     void savePost_ShouldReturnSavedPostResponse() {
@@ -59,7 +57,7 @@ class PostServiceTest {
         mockUserFound(userUuid, owner);
         when(postRepository.save(any(Post.class))).thenReturn(savedPost);
 
-        PostResponse result = postService.save(request, userUuid);
+        PostResponse result = postService.createPost(request, userUuid);
 
         assertNotNull(result);
         assertEquals(savedPost.getUuid(), result.uuid());
@@ -77,22 +75,20 @@ class PostServiceTest {
         mockUserNotFound(userUuid);
 
         assertThrows(EntityNotFoundException.class, () ->
-                postService.save(request, userUuid)
+                postService.createPost(request, userUuid)
         );
 
         verifyNoInteractions(postRepository);
     }
 
-    // =========================
-    // 🧪 FIND
-    // =========================
 
+    //FIND
     @Test
     @DisplayName("Should return post when searching by UUID")
     void findByUuid_ShouldReturnPostResponse() {
         mockPostFound(savedPost);
 
-        PostResponse result = postService.findByUuid(savedPost.getUuid());
+        PostResponse result = postService.getPostById(savedPost.getUuid());
 
         assertNotNull(result);
         assertEquals(savedPost.getTitle(), result.title());
@@ -104,14 +100,12 @@ class PostServiceTest {
         mockPostNotFound();
 
         assertThrows(EntityNotFoundException.class, () ->
-                postService.findByUuid(UUID.randomUUID())
+                postService.getPostById(UUID.randomUUID())
         );
     }
 
-    // =========================
-    // 🧪 JOIN
-    // =========================
 
+    //JOIN
     @Test
     @DisplayName("Should create a participant when user joins")
     void joinPost_Success() {
@@ -178,10 +172,7 @@ class PostServiceTest {
         );
     }
 
-    // =========================
-    // 🧪 LEAVE
-    // =========================
-
+    //LEAVE
     @Test
     @DisplayName("Should add and then remove participant")
     void joinAndLeavePost_Success() {
@@ -246,11 +237,109 @@ class PostServiceTest {
 
         assertEquals(PostStatus.OPEN, savedPost.getStatus());
     }
+    @Test
+    void shouldUpdatePostSuccessfully(){
+        PostUpdateRequest request = new PostUpdateRequest(
+                "Nuevo título",
+                Location.create(80.0,90.0),
+                LocalDateTime.now().plusDays(1),
+                10
+        );
+        mockPostFound(savedPost);
+        when(postRepository.save(any(Post.class))).thenReturn(savedPost);
 
-    // =========================
-    // 🧩 HELPERS
-    // =========================
+        PostResponse response = postService.updatePost(savedPost.getUuid(), request);
 
+        // then
+        assertEquals("Nuevo título", response.title());
+        verify(postMapper).toDto(savedPost);
+    }
+    @Test
+    void shouldThrowExceptionWhenPostNotFound() {
+        UUID uuid = UUID.randomUUID();
+        PostUpdateRequest request = new PostUpdateRequest(
+                "Nuevo título",
+                Location.create(80.0,90.0),
+                LocalDateTime.now().plusDays(1),
+                10
+        );
+
+        mockPostNotFound();
+        // when / then
+        assertThrows(RuntimeException.class, () ->
+                postService.updatePost(uuid, request)
+    );
+    }
+    @Test
+    @DisplayName("Should keep existing data when update request fields are null")
+    void shouldNotUpdateFieldsWhenNull() {
+        // Given
+        PostUpdateRequest request = new PostUpdateRequest(null, null, null, null);
+
+        // Guardamos los valores originales para comparar
+        String originalTitle = savedPost.getTitle();
+        Location originalLocation = savedPost.getLocation();
+
+        mockPostFound(savedPost);
+        when(postRepository.save(any(Post.class))).thenAnswer(invocation -> invocation.getArgument(0));
+
+        // When
+        PostResponse result = postService.updatePost(savedPost.getUuid(), request);
+
+        // Then
+        assertNotNull(result);
+        assertEquals(originalTitle, result.title(), "Title should not have changed");
+        assertEquals(originalLocation.getLatitude(), savedPost.getLocation().getLatitude(), "Location should remain the same");
+
+        verify(postRepository).save(savedPost);
+    }
+    @Test
+    @DisplayName("Should throw IllegalStateException when reducing capacity below current participants count")
+    void shouldThrowExceptionWhenReducingMaxParticipantsBelowCurrent() {
+        for (int i = 0; i < 4; i++) {
+            savedPost.addParticipant(createUser("User" + i));
+        }
+
+        PostUpdateRequest request = new PostUpdateRequest(
+                null,
+                null,
+                null,
+                3
+        );
+
+        mockPostFound(savedPost);
+
+        assertThrows(IllegalStateException.class, () ->
+                postService.updatePost(savedPost.getUuid(), request)
+        );
+
+        verify(postRepository, never()).save(any());
+    }
+    @Test
+    @DisplayName("Should change status to OPEN when maxParticipants increases and post was FULL")
+    void shouldUpdateStatusToOpenWhenMaxParticipantsChanges() {
+        savedPost.setStatus(PostStatus.FULL);
+        savedPost.setMaxParticipants(5);
+        for (int i = 0; i < 5; i++) {
+            savedPost.addParticipant(createUser("User" + i));
+        }
+
+        PostUpdateRequest request = new PostUpdateRequest(
+                null, null, null, 10
+        );
+
+        mockPostFound(savedPost);
+        when(postRepository.save(any(Post.class))).thenReturn(savedPost);
+
+        postService.updatePost(savedPost.getUuid(), request);
+
+        assertEquals(PostStatus.OPEN, savedPost.getStatus(),
+                "The post should be OPEN after increasing capacity");
+        assertEquals(10, savedPost.getMaxParticipants());
+        verify(postRepository).save(savedPost);
+    }
+
+    //HELPERS
     private User createUser(String name) {
         return User.create(name, "img.png");
     }

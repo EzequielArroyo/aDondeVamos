@@ -56,6 +56,21 @@ public class Post {
     public static Post create(String title, Location location, LocalDateTime activityDate, Integer maxParticipants, User owner) {
         return new Post(title, location, activityDate, maxParticipants, owner);
     }
+    public void update(String title, Location location, LocalDateTime activityDate, Integer maxParticipants) {
+        this.validatePostIsInteractable();
+
+        if (maxParticipants != null && maxParticipants < this.participants.size()) {
+            throw new IllegalStateException("No puedes reducir el cupo por debajo de los participantes actuales (" + this.participants.size() + ")");
+        }
+
+        if (title != null && !title.isBlank()) this.title = title;
+        if (location != null) this.location = location;
+        if (activityDate != null) this.activityDate = activityDate;
+        if (maxParticipants != null) {
+            this.maxParticipants = maxParticipants;
+            this.updateStatus();
+        }
+    }
     public void addParticipant(User user) {
         this.validatePostIsInteractable();
         this.validateUserCanJoin(user);
