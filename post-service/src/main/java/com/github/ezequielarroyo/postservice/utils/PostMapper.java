@@ -1,6 +1,5 @@
 package com.github.ezequielarroyo.postservice.utils;
 
-import com.github.ezequielarroyo.postservice.dtos.input.PostCreateRequest;
 import com.github.ezequielarroyo.postservice.dtos.output.PostResponse;
 import com.github.ezequielarroyo.postservice.entities.Post;
 import org.springframework.stereotype.Component;
