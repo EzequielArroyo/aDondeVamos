@@ -7,6 +7,6 @@ import org.springframework.stereotype.Component;
 @Component
 public class UserMapper {
     User toEntity(UserDTO dto) {
-        return User.create(dto.uuid(), dto.username(), dto.avatar());
+        return User.create(dto.userId(), dto.username(), dto.avatar());
     }
 }
