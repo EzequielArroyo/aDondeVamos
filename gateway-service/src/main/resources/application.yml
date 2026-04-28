@@ -15,21 +15,15 @@ spring:
       discovery:
         locator:
           enabled: true
-management:
-  endpoint:
-    gateway:
-      enabled: true
-  endpoints:
-    web:
-      exposure:
-        include: "*"
-
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: https://dev-skt01p8dhor0esjl.us.auth0.com/
+          audiences: https://ddsi.com/api/ddsi-poc-microservicios
 
 eureka:
   client:
     serviceUrl:
       defaultZone: http://localhost:8761/eureka/
     registerWithEureka: true
-
-
-debug: true
