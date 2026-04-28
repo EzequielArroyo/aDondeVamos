@@ -9,10 +9,10 @@ import org.springframework.data.domain.Pageable;
 import java.util.UUID;
 
 public interface IPostService {
-    PostResponse createPost(PostCreateRequest request, UUID uuid);
+    PostResponse createPost(PostCreateRequest request);
     PostResponse getPostById(UUID uuid);
     Page<PostResponse> getAllPosts(Pageable pageable);
-    void joinPost(UUID postUuid, UUID userUuid);
-    void leavePost(UUID PostUuid, UUID userUuid);
+    void joinPost(UUID postUuid);
+    void leavePost(UUID PostUuid);
     PostResponse updatePost(UUID PostUuid, PostUpdateRequest request);
 }

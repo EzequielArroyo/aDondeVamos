@@ -51,7 +51,6 @@ public class Post {
         this.activityDate = activityDate;
         this.maxParticipants = maxParticipants;
         this.owner = owner;
-
     }
     public static Post create(String title, Location location, LocalDateTime activityDate, Integer maxParticipants, User owner) {
         return new Post(title, location, activityDate, maxParticipants, owner);
@@ -81,10 +80,10 @@ public class Post {
     public void removeParticipant(User user) {
         this.validatePostIsInteractable();
         boolean removed = this.participants.removeIf(p ->
-                p.getUser().getUuid().equals(user.getUuid())
+                p.getUser().getUserId().equals(user.getUserId())
         );
         if (!removed) {
-            throw new EntityNotFoundException("User is not a participant of this post");
+            throw new IllegalStateException("User is not a participant of this post");
         }
         this.updateStatus();
     }
@@ -115,7 +114,7 @@ public class Post {
         return this.status == PostStatus.CANCELLED;
     }
     private boolean userAlreadyInPost(User user) {
-        return this.participants.stream().anyMatch(p -> p.getUser().getUuid().equals(user.getUuid()));
+        return this.participants.stream().anyMatch(p -> p.getUser().getUserId().equals(user.getUserId()));
     }
     private void updateStatus() {
         if (isFull()) {
