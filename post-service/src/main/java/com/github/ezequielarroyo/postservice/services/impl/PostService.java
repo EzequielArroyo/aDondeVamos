@@ -7,8 +7,8 @@ import com.github.ezequielarroyo.postservice.entities.Post;
 import com.github.ezequielarroyo.postservice.entities.User;
 import com.github.ezequielarroyo.postservice.repositories.IPostRepository;
 import com.github.ezequielarroyo.postservice.services.IPostService;
-import com.github.ezequielarroyo.postservice.services.IUserService;
 import com.github.ezequielarroyo.postservice.utils.PostMapper;
+import com.github.ezequielarroyo.postservice.utils.user.ICurrentUserResolver;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -20,18 +20,21 @@ import java.util.UUID;
 @Service
 public class PostService implements IPostService {
     private final IPostRepository postRepository;
-    private final IUserService userService;
+    private final ICurrentUserResolver currentUserResolver;
     private final PostMapper postMapper;
 
-    public PostService(IPostRepository postRepository, IUserService userService, PostMapper postMapper) {
+    public PostService(IPostRepository postRepository, ICurrentUserResolver userFacade, PostMapper postMapper) {
         this.postRepository = postRepository;
-        this.userService = userService;
+        this.currentUserResolver = userFacade;
         this.postMapper = postMapper;
     }
 
     @Override
-    public PostResponse createPost(PostCreateRequest request, UUID uuid) {
-        User owner = userService.findByUuid(uuid);
+    public PostResponse createPost(PostCreateRequest request) {
+        User owner = currentUserResolver.getCurrentUser();
+        if (owner == null) {
+            throw new EntityNotFoundException("User not found");
+        }
         Post post = Post.create(
                 request.title(),
                 request.location(),
@@ -41,7 +44,6 @@ public class PostService implements IPostService {
         );
         Post savedPost = postRepository.save(post);
         return postMapper.toDto(savedPost);
-
     }
 
     @Override
@@ -56,17 +58,17 @@ public class PostService implements IPostService {
     }
 
     @Transactional
-    public void joinPost(UUID postUuid, UUID userUuid) {
+    public void joinPost(UUID postUuid) {
         Post post = this.getPostByUuid(postUuid);
-        User user = userService.findByUuid(userUuid);
+        User user = currentUserResolver.getCurrentUser();
         post.addParticipant(user);
         postRepository.save(post);
     }
 
     @Transactional
-    public void leavePost(UUID postUuid, UUID userUuid) {
+    public void leavePost(UUID postUuid) {
         Post post = this.getPostByUuid(postUuid);
-        User user = userService.findByUuid(userUuid);
+        User user = currentUserResolver.getCurrentUser();
         post.removeParticipant(user);
         postRepository.save(post);
     }
