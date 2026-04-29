@@ -15,4 +15,5 @@ public interface IPostService {
     void joinPost(UUID postUuid);
     void leavePost(UUID PostUuid);
     PostResponse updatePost(UUID PostUuid, PostUpdateRequest request);
+    void deletePost(UUID uuid);
 }

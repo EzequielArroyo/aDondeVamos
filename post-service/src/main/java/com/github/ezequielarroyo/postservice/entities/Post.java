@@ -87,6 +87,11 @@ public class Post {
         }
         this.updateStatus();
     }
+    public void canceled(){
+        this.status = PostStatus.CANCELLED;
+        this.active = false;
+    }
+
     private void validatePostIsInteractable() {
         if (!this.active) {
             throw new IllegalStateException("Post not available");
@@ -123,5 +128,4 @@ public class Post {
             this.status = PostStatus.OPEN;
         }
     }
-
 }

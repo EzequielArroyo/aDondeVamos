@@ -80,6 +80,13 @@ public class PostService implements IPostService {
         return postMapper.toDto(postRepository.save(post));
     }
 
+    @Override
+    public void deletePost(UUID uuid) {
+        Post post = this.getPostByUuid(uuid);
+        post.canceled();
+        postRepository.save(post);
+    }
+
     private Post getPostByUuid(UUID uuid) {
         return postRepository.findByUuid(uuid)
                 .orElseThrow(()-> new EntityNotFoundException("Post not found with uuid: " + uuid));
