@@ -1,8 +1,10 @@
 package com.github.ezequielarroyo.domain.userservice.controllers;
 
-import com.github.ezequielarroyo.domain.userservice.dtos.UserRequest;
+import com.github.ezequielarroyo.domain.userservice.dtos.UserCreateRequest;
+import com.github.ezequielarroyo.domain.userservice.dtos.UserUpdateRequest;
 import com.github.ezequielarroyo.domain.userservice.dtos.UserResponse;
 import com.github.ezequielarroyo.domain.userservice.services.IUserService;
+import jakarta.validation.Valid;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
@@ -40,7 +42,7 @@ public class UserController {
     }
 
     @PostMapping
-    public ResponseEntity<UUID> createUser(@RequestBody UserRequest request) {
+    public ResponseEntity<UUID> createUser(@RequestBody UserCreateRequest request) {
         UUID userId = userService.createUser(request);
         URI location = ServletUriComponentsBuilder.fromCurrentRequest()
                 .path("/{id}")
@@ -54,7 +56,7 @@ public class UserController {
         return ResponseEntity.ok(response);
     }
     @PutMapping("/me")
-    public ResponseEntity<Void> updateUser(@RequestBody UserRequest request) {
+    public ResponseEntity<Void> updateUser(@Valid @RequestBody UserUpdateRequest request) {
         userService.updateUser(request);
         return ResponseEntity.noContent().build();
     }

@@ -1,6 +1,7 @@
 package com.github.ezequielarroyo.domain.userservice.services;
 import com.github.ezequielarroyo.domain.userservice.auth.IAuthService;
-import com.github.ezequielarroyo.domain.userservice.dtos.UserRequest;
+import com.github.ezequielarroyo.domain.userservice.dtos.UserCreateRequest;
+import com.github.ezequielarroyo.domain.userservice.dtos.UserUpdateRequest;
 import com.github.ezequielarroyo.domain.userservice.dtos.UserResponse;
 import com.github.ezequielarroyo.domain.userservice.entities.User;
 import com.github.ezequielarroyo.domain.userservice.repositories.IUserRepository;
@@ -41,7 +42,7 @@ public class UserService implements IUserService{
     }
 
     @Override
-    public UUID createUser(UserRequest request) {
+    public UUID createUser(UserCreateRequest request) {
         User userToCreate = mapper.toUser(request);
         User createdUser = userRepository.save(userToCreate);
         return createdUser.getUuid();
@@ -54,7 +55,7 @@ public class UserService implements IUserService{
     }
 
     @Override
-    public void updateUser(UserRequest request) {
+    public void updateUser(UserUpdateRequest request) {
         UUID userUuid = authService.getCurrentUserId();
         User existingUser = this.findUserByUuid(userUuid);
         User userToUpdate = userUpdater.updateUser(existingUser, request);

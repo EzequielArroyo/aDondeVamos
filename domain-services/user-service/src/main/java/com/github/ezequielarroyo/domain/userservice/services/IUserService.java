@@ -1,6 +1,7 @@
 package com.github.ezequielarroyo.domain.userservice.services;
 
-import com.github.ezequielarroyo.domain.userservice.dtos.UserRequest;
+import com.github.ezequielarroyo.domain.userservice.dtos.UserCreateRequest;
+import com.github.ezequielarroyo.domain.userservice.dtos.UserUpdateRequest;
 import com.github.ezequielarroyo.domain.userservice.dtos.UserResponse;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -11,8 +12,8 @@ public interface IUserService {
     Page<UserResponse> getAllUsers(Pageable pageable);
     UserResponse getUserByUuid(UUID id);
     UserResponse getUserByUsername(String username);
-    UUID createUser(UserRequest request);
+    UUID createUser(UserCreateRequest request);
     UserResponse getCurrentUser();
-    void updateUser(UserRequest request);
+    void updateUser(UserUpdateRequest request);
     void deleteUser(UUID id);
 }

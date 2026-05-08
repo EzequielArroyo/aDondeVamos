@@ -1,6 +1,6 @@
 package com.github.ezequielarroyo.domain.userservice.utils;
 
-import com.github.ezequielarroyo.domain.userservice.dtos.UserRequest;
+import com.github.ezequielarroyo.domain.userservice.dtos.UserCreateRequest;
 import com.github.ezequielarroyo.domain.userservice.dtos.UserResponse;
 import com.github.ezequielarroyo.domain.userservice.entities.User;
 import org.springframework.stereotype.Service;
@@ -18,13 +18,13 @@ public class UserMapper {
                 .isCompleted(user.getIsCompleted())
                 .build();
     }
-    public User toUser(UserRequest userRequest) {
+
+    public User toUser(UserCreateRequest userCreateRequest) {
         return User.create(
-                userRequest.username(),
-                userRequest.name(),
-                userRequest.lastname(),
-                userRequest.email(),
-                userRequest.avatar()
-                );
+                userCreateRequest.username(),
+                userCreateRequest.name(),
+                userCreateRequest.lastName(),
+                userCreateRequest.email()
+        );
     }
 }

@@ -33,17 +33,17 @@ public class User {
     @Column
     private Boolean isCompleted;
 
-    private User(String username, String name,String lastName, String email, String avatar) {
+    private User(String username, String name,String lastName, String email) {
         this.uuid = UUID.randomUUID();
         this.username = username;
         this.name = name;
         this.lastName = lastName;
         this.email = email;
-        this.avatar = avatar;
+        this.avatar = null;
         this.isCompleted = false;
     }
-    public static User create(String username, String name, String lastName, String email, String avatar) {
-        return new User(username, name, lastName, email, avatar);
+    public static User create(String username, String name, String lastName, String email){
+        return new User(username, name, lastName, email);
     }
 
     public void changeUsername(String username) {
