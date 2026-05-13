@@ -1,0 +1,3 @@
+com\github\ezequielarroyo\domain\commonexceptions\ErrorResponse.class
+com\github\ezequielarroyo\domain\commonexceptions\GlobalExceptionHandler.class
+com\github\ezequielarroyo\domain\commonexceptions\ErrorResponse$ErrorResponseBuilder.class
