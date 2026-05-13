@@ -3,12 +3,6 @@
   <component name="CompilerConfiguration">
     <annotationProcessing>
       <profile default="true" name="Default" enabled="true" />
-      <profile name="Maven default annotation processors profile" enabled="true">
-        <sourceOutputDir name="target/generated-sources/annotations" />
-        <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
-        <outputRelativeToContentRoot value="true" />
-        <module name="gateway-service" />
-      </profile>
       <profile name="Annotation profile for adondevamos" enabled="true">
         <sourceOutputDir name="target/generated-sources/annotations" />
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
@@ -17,10 +11,11 @@
           <entry name="$MAVEN_REPOSITORY$/org/projectlombok/lombok/1.18.46/lombok-1.18.46.jar" />
         </processorPath>
         <module name="config-server" />
-        <module name="discovery-service" />
+        <module name="post-service" />
+        <module name="common-exceptions" />
         <module name="user-service" />
       </profile>
-      <profile name="Annotation profile for post-service" enabled="true">
+      <profile name="Annotation profile for discovery-server" enabled="true">
         <sourceOutputDir name="target/generated-sources/annotations" />
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
@@ -28,28 +23,19 @@
           <entry name="$MAVEN_REPOSITORY$/org/projectlombok/lombok/1.18.46/lombok-1.18.46.jar" />
           <entry name="$MAVEN_REPOSITORY$/org/projectlombok/lombok/1.18.46/lombok-1.18.46.jar" />
         </processorPath>
-        <module name="post-service" />
+        <module name="discovery-service" />
       </profile>
     </annotationProcessing>
-    <bytecodeTargetLevel>
-      <module name="aDondeVamos" target="1.5" />
-      <module name="auth-service" target="21" />
-      <module name="post-service1" target="17" />
-    </bytecodeTargetLevel>
   </component>
   <component name="JavacSettings">
     <option name="ADDITIONAL_OPTIONS_OVERRIDE">
       <module name="adondevamos" options="-parameters" />
-      <module name="auth-service" options="-parameters" />
+      <module name="common-exceptions" options="-parameters" />
       <module name="config-server" options="-parameters" />
       <module name="discovery-service" options="-parameters" />
       <module name="domain-services" options="-parameters" />
-      <module name="gateway-service" options="-parameters" />
       <module name="post-service" options="-parameters" />
-      <module name="post-service1" options="-parameters" />
       <module name="user-service" options="-parameters" />
-      <module name="user-service.main" options="-parameters" />
-      <module name="user-service.test" options="-parameters" />
     </option>
   </component>
 </project>
