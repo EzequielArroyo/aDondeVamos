@@ -4,10 +4,11 @@ import com.github.ezequielarroyo.domain.userservice.dtos.UserCreateRequest;
 import com.github.ezequielarroyo.domain.userservice.dtos.UserUpdateRequest;
 import com.github.ezequielarroyo.domain.userservice.dtos.UserResponse;
 import com.github.ezequielarroyo.domain.userservice.entities.User;
+import com.github.ezequielarroyo.domain.userservice.exceptions.UserAlreadyExistsException;
+import com.github.ezequielarroyo.domain.userservice.exceptions.UserNotFoundException;
 import com.github.ezequielarroyo.domain.userservice.repositories.IUserRepository;
 import com.github.ezequielarroyo.domain.userservice.utils.UserMapper;
 import com.github.ezequielarroyo.domain.userservice.utils.UserUpdater;
-import jakarta.ws.rs.NotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -36,13 +37,15 @@ public class UserService implements IUserService{
     }
     @Override
     public UserResponse getUserByUsername(String username) {
-        User userFound = userRepository.findByUsername(username)
-                .orElseThrow(() -> new NotFoundException("User not found with uuid: " + username));
+        User userFound = this.findUserByUsername(username);
         return mapper.toUserResponse(userFound);
     }
 
     @Override
     public UUID createUser(UserCreateRequest request) {
+        if(userRepository.findByUsername(request.username()).isPresent()){
+            throw new UserAlreadyExistsException(request.username());
+        }
         User userToCreate = mapper.toUser(request);
         User createdUser = userRepository.save(userToCreate);
         return createdUser.getUuid();
@@ -69,6 +72,10 @@ public class UserService implements IUserService{
     }
     private User findUserByUuid(UUID uuid){
         return userRepository.findByUuid(uuid)
-                .orElseThrow(() -> new NotFoundException("User not found with uuid: " + uuid));
+                .orElseThrow(() -> new UserNotFoundException(uuid.toString()));
+    }
+    private User findUserByUsername(String username) {
+        return userRepository.findByUsername(username)
+                .orElseThrow(() -> new UserNotFoundException(username));
     }
 }
