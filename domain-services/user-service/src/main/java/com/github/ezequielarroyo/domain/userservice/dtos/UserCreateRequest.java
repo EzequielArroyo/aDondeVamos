@@ -1,14 +1,15 @@
 package com.github.ezequielarroyo.domain.userservice.dtos;
 
-import jakarta.annotation.Nonnull;
 import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotNull;
 
 public record UserCreateRequest(
-        @Nonnull
+        @NotNull(message = "Username is required")
         String username,
         String name,
         String lastName,
-        @Nonnull @Email
+        @NotNull(message = "Email is required")
+        @Email(message = "Email is not valid")
         String email
 ) {
 }
