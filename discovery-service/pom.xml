@@ -7,8 +7,8 @@
         <artifactId>adondevamos</artifactId>
         <version>0.0.1-SNAPSHOT</version>
     </parent>
-    <artifactId>discovery-server</artifactId>
-    <name>discovery-server</name>
+    <artifactId>discovery-service</artifactId>
+    <name>discovery-service</name>
     <description/>
     <properties>
         <spring-cloud.version>2025.0.2</spring-cloud.version>
