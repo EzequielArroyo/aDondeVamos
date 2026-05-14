@@ -8,7 +8,7 @@ import com.github.ezequielarroyo.postservice.entities.Post;
 import com.github.ezequielarroyo.postservice.entities.PostStatus;
 import com.github.ezequielarroyo.postservice.entities.User;
 import com.github.ezequielarroyo.postservice.repositories.IPostRepository;
-import com.github.ezequielarroyo.postservice.services.imp.PostService;
+import com.github.ezequielarroyo.postservice.services.impl.PostService;
 import com.github.ezequielarroyo.postservice.utils.PostMapper;
 import com.github.ezequielarroyo.postservice.utils.user.ICurrentUserResolver;
 import jakarta.persistence.EntityNotFoundException;
