@@ -2,6 +2,7 @@ package com.github.ezequielarroyo.domain.userservice.exceptions;
 
 import com.github.ezequielarroyo.domain.commonexceptions.ErrorResponse;
 import com.github.ezequielarroyo.domain.commonexceptions.GlobalExceptionHandler;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Primary;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -12,6 +13,7 @@ import java.time.LocalDateTime;
 
 @RestControllerAdvice(basePackages = "com.github.ezequielarroyo.domain.userservice.controllers")
 @Primary
+@Slf4j
 public class UserExceptionHandler extends GlobalExceptionHandler {
 
     @ExceptionHandler(UserNotFoundException.class)
@@ -21,6 +23,7 @@ public class UserExceptionHandler extends GlobalExceptionHandler {
                 .message(ex.getMessage())
                 .timestamp(LocalDateTime.now())
                 .build();
+        log.warn("User not found: {}", ex.getMessage());
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
     }
     @ExceptionHandler(UserAlreadyExistsException.class)
@@ -30,6 +33,7 @@ public class UserExceptionHandler extends GlobalExceptionHandler {
                 .message(ex.getMessage())
                 .timestamp(LocalDateTime.now())
                 .build();
+        log.warn("User already exists: {}", ex.getMessage());
         return ResponseEntity.status(HttpStatus.CONFLICT).body(errorResponse);
     }
 }

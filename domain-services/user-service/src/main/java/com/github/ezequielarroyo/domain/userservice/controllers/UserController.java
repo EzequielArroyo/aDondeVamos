@@ -5,6 +5,7 @@ import com.github.ezequielarroyo.domain.userservice.dtos.UserUpdateRequest;
 import com.github.ezequielarroyo.domain.userservice.dtos.UserResponse;
 import com.github.ezequielarroyo.domain.userservice.services.IUserService;
 import jakarta.validation.Valid;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
@@ -16,6 +17,7 @@ import java.util.UUID;
 
 @RestController
 @RequestMapping("api/v1/users")
+@Slf4j
 public class UserController {
 
     private final IUserService userService;
@@ -30,19 +32,19 @@ public class UserController {
         return ResponseEntity.ok(userResponsePage);
     }
 
-    @GetMapping("/{id}")
+    @GetMapping("/id/{id}")
     public ResponseEntity<UserResponse> getUserById(@PathVariable UUID id) {
         UserResponse userResponse = userService.getUserByUuid(id);
         return ResponseEntity.ok(userResponse);
     }
-    @GetMapping("/{username}")
+    @GetMapping("/username/{username}")
     public ResponseEntity<UserResponse> getUserByUsername(@PathVariable String username) {
         UserResponse userResponse = userService.getUserByUsername(username);
         return ResponseEntity.ok(userResponse);
     }
 
     @PostMapping
-    public ResponseEntity<UUID> createUser(@RequestBody UserCreateRequest request) {
+    public ResponseEntity<UUID> createUser(@Valid @RequestBody UserCreateRequest request) {
         UUID userId = userService.createUser(request);
         URI location = ServletUriComponentsBuilder.fromCurrentRequest()
                 .path("/{id}")
@@ -52,7 +54,9 @@ public class UserController {
     }
     @GetMapping("/me")
     public ResponseEntity<UserResponse> getCurrentUser() {
+        log.debug("REST request to get profile");
         UserResponse response = userService.getCurrentUser();
+        log.debug("END of REST request to get profile");
         return ResponseEntity.ok(response);
     }
     @PutMapping("/me")

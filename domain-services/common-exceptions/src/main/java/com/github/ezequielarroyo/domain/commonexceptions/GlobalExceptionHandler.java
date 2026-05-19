@@ -1,5 +1,6 @@
 package com.github.ezequielarroyo.domain.commonexceptions;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
@@ -13,8 +14,8 @@ import java.util.Map;
 
 @Component
 @RestControllerAdvice
+@Slf4j
 public class GlobalExceptionHandler {
-
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<ErrorResponse> handleMethodArgumentNotValidException(MethodArgumentNotValidException ex) {
         Map<String, String> fieldErrors = new HashMap<>();
@@ -25,6 +26,7 @@ public class GlobalExceptionHandler {
                 .timestamp(LocalDateTime.now())
                 .details(fieldErrors)
                 .build();
+        log.warn("Validation error: {}", ex.getMessage());
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
     }
 
@@ -35,6 +37,7 @@ public class GlobalExceptionHandler {
                 .message("An error occurred, please try again later")
                 .timestamp(LocalDateTime.now())
                 .build();
+        log.error("Error: {}", ex.getMessage());
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponse);
     }
 }
