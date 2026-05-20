@@ -42,7 +42,6 @@ public class UserController {
         UserResponse userResponse = userService.getUserByUsername(username);
         return ResponseEntity.ok(userResponse);
     }
-
     @PostMapping
     public ResponseEntity<UUID> createUser(@Valid @RequestBody UserCreateRequest request) {
         UUID userId = userService.createUser(request);
@@ -59,7 +58,8 @@ public class UserController {
         log.debug("END of REST request to get profile");
         return ResponseEntity.ok(response);
     }
-    @PutMapping("/me")
+
+    @PatchMapping("/me")
     public ResponseEntity<Void> updateUser(@Valid @RequestBody UserUpdateRequest request) {
         userService.updateUser(request);
         return ResponseEntity.noContent().build();

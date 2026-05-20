@@ -1,21 +1,13 @@
 package com.github.ezequielarroyo.domain.userservice.dtos;
 
-import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.Min;
-import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 
 public record UserUpdateRequest(
-        @NotNull(message = "Username is required")
-        @Min(message = "Username must be at least 3 characters long", value = 3)
+        @Size(message = "Username must be at least 3 characters long", min = 3)
         String username,
-        @NotNull(message = "Name is required")
-        @Min(message = "Name must be at least 2 characters long", value = 2)
-        String name,
-        @NotNull(message = "Last name is required")
-        @Min(message = "Last name must be at least 2 characters long", value = 2)
+        @Size(message = "Name must be at least 2 characters long", min = 3)
+        String firstname,
+        @Size(message = "Last name must be at least 2 characters long", min = 3)
         String lastname,
-        @NotNull(message = "Email is required")
-        @Email(message = "Email is not valid")
-        String email,
         String avatar
 ) {}

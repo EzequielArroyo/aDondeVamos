@@ -2,18 +2,19 @@ package com.github.ezequielarroyo.domain.userservice.services;
 
 import com.github.ezequielarroyo.domain.userservice.auth.IAuthService;
 import com.github.ezequielarroyo.domain.userservice.dtos.UserCreateRequest;
+import com.github.ezequielarroyo.domain.userservice.dtos.UserProfileData;
 import com.github.ezequielarroyo.domain.userservice.dtos.UserResponse;
 import com.github.ezequielarroyo.domain.userservice.dtos.UserUpdateRequest;
 import com.github.ezequielarroyo.domain.userservice.entities.User;
-import com.github.ezequielarroyo.domain.userservice.exceptions.UserAlreadyExistsException;
+import com.github.ezequielarroyo.domain.userservice.exceptions.EmailAlreadyExistsException;
 import com.github.ezequielarroyo.domain.userservice.exceptions.UserNotFoundException;
 import com.github.ezequielarroyo.domain.userservice.repositories.IUserRepository;
 import com.github.ezequielarroyo.domain.userservice.utils.UserMapper;
-import com.github.ezequielarroyo.domain.userservice.utils.UserUpdater;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -39,38 +40,43 @@ class UserServiceTest {
     private IAuthService authService;
     @Mock
     private UserMapper mapper;
-    @Mock
-    private UserUpdater userUpdater;
 
     @InjectMocks
     private UserService userService;
 
     // --- Object Creation Helpers ---
 
-    private User createSampleUser(String username, String email) {
-        return User.create(username, "John", "Doe", email);
+    private User createSampleUser() {
+        return User.create("test_user", "John", "Doe", "test@gmail.com","avatarTest.png");
     }
 
     private UserResponse createSampleUserResponse(User user) {
         return UserResponse.builder()
                 .uuid(user.getUuid())
                 .username(user.getUsername())
-                .name(user.getName())
-                .lastName(user.getLastName())
+                .firstname(user.getFirstname())
+                .lastName(user.getLastname())
                 .email(user.getEmail())
                 .avatar(user.getAvatar())
-                .isCompleted(user.getIsCompleted())
                 .build();
     }
 
-    private UserCreateRequest createSampleCreateRequest(String username) {
-        return new UserCreateRequest(username, "John", "Doe", username + "@example.com");
+    private UserCreateRequest createSampleCreateRequest() {
+        return new UserCreateRequest("test_user", "John", "Doe", "test@gmail.com","avatarTest.png");
     }
 
     private UserUpdateRequest createSampleUpdateRequest() {
-        return new UserUpdateRequest("updatedUser", "JohnUpdate", "DoeUpdate", "update@example.com", "new_avatar.png");
+        return new UserUpdateRequest("updatedUser", "JohnUpdate", "DoeUpdate", "new_avatar.png");
     }
-
+    private UserProfileData createSampleUserProfileData() {
+        return UserProfileData.builder()
+                .username("updatedUser")
+                .firstname("JohnUpdate")
+                .lastname("DoeUpdate")
+                .email(null)
+                .avatar("new_avatar.png")
+                .build();
+    }
     // --- Stubbing Helpers (Encapsulated "when") ---
 
     private void givenUserRepositoryReturnsPage(Pageable pageable, Page<User> page) {
@@ -81,16 +87,8 @@ class UserServiceTest {
         when(userRepository.findByUuid(user.getUuid())).thenReturn(Optional.of(user));
     }
 
-    private void givenUserExistsByUsername(User user) {
-        when(userRepository.findByUsername(user.getUsername())).thenReturn(Optional.of(user));
-    }
-
     private void givenUserNotFoundInRepo(UUID uuid) {
         when(userRepository.findByUuid(uuid)).thenReturn(Optional.empty());
-    }
-
-    private void givenUserNotFoundByUsername(String username) {
-        when(userRepository.findByUsername(username)).thenReturn(Optional.empty());
     }
 
     private void givenCurrentUserIdIs(UUID uuid) {
@@ -100,18 +98,25 @@ class UserServiceTest {
     private void givenMapperConvertsToResponse(User user, UserResponse response) {
         when(mapper.toUserResponse(user)).thenReturn(response);
     }
+    private void givenEmailExistsInRepo(String email) {
+        when(userRepository.existsByEmail(email)).thenReturn(Boolean.TRUE);
+    }
+    private void givenEmailNotFoundInRepo(String email) {
+        when(userRepository.existsByEmail(email)).thenReturn(Boolean.FALSE);
+    }
 
     private void givenMapperConvertsToEntity(UserCreateRequest request, User user) {
         when(mapper.toUser(request)).thenReturn(user);
+    }
+    private void givenMapperConvertsToUserProfileData(UserUpdateRequest request, UserProfileData data) {
+        when(mapper.toUserProfileData(request)).thenReturn(data);
     }
 
     private void givenUserRepositorySavesUser(User user) {
         when(userRepository.save(any(User.class))).thenReturn(user);
     }
 
-    private void givenUserUpdaterProcessesRequest(User existing, UserUpdateRequest request, User updated) {
-        when(userUpdater.updateUser(existing, request)).thenReturn(updated);
-    }
+
 
     // --- Test Suites ---
 
@@ -123,7 +128,7 @@ class UserServiceTest {
         @DisplayName("Should return a page of UserResponse when users exist")
         void getAllUsers_Success() {
             Pageable pageable = PageRequest.of(0, 10);
-            User user = createSampleUser("jdoe", "jdoe@example.com");
+            User user = createSampleUser();
             UserResponse response = createSampleUserResponse(user);
             Page<User> userPage = new PageImpl<>(Collections.singletonList(user));
 
@@ -134,7 +139,7 @@ class UserServiceTest {
 
             assertNotNull(result);
             assertEquals(1, result.getContent().size());
-            assertEquals("jdoe", result.getContent().getFirst().username());
+            assertEquals("test_user", result.getContent().getFirst().username());
         }
 
         @Test
@@ -156,7 +161,7 @@ class UserServiceTest {
         @Test
         @DisplayName("Should return UserResponse when UUID exists")
         void getUserByUuid_Success() {
-            User user = createSampleUser("test_user", "test@example.com");
+            User user = createSampleUser();
             UserResponse response = createSampleUserResponse(user);
 
             givenUserExistsInRepo(user);
@@ -185,10 +190,10 @@ class UserServiceTest {
         @Test
         @DisplayName("Should create user and return UUID successfully")
         void createUser_Success() {
-            UserCreateRequest request = createSampleCreateRequest("new_user");
-            User userEntity = createSampleUser(request.username(), request.email());
+            UserCreateRequest request = createSampleCreateRequest();
+            User userEntity = createSampleUser();
 
-            givenUserNotFoundByUsername(request.username());
+            givenEmailNotFoundInRepo(request.email());
             givenMapperConvertsToEntity(request, userEntity);
             givenUserRepositorySavesUser(userEntity);
 
@@ -199,14 +204,13 @@ class UserServiceTest {
         }
 
         @Test
-        @DisplayName("Should throw UserAlreadyExistsException when username is taken")
+        @DisplayName("Should throw EmailAlreadyExistsException when email is taken")
         void createUser_AlreadyExists() {
-            UserCreateRequest request = createSampleCreateRequest("existing_user");
-            User existingUser = createSampleUser(request.username(), request.email());
+            UserCreateRequest request = createSampleCreateRequest();
 
-            givenUserExistsByUsername(existingUser);
+            givenEmailExistsInRepo(request.email());
 
-            assertThrows(UserAlreadyExistsException.class, () -> userService.createUser(request));
+            assertThrows(EmailAlreadyExistsException.class, () -> userService.createUser(request));
             verify(userRepository, never()).save(any());
         }
     }
@@ -218,7 +222,7 @@ class UserServiceTest {
         @Test
         @DisplayName("Should return current logged user response")
         void getCurrentUser_Success() {
-            User user = createSampleUser("auth_user", "auth@example.com");
+            User user = createSampleUser();
             UserResponse response = createSampleUserResponse(user);
 
             givenCurrentUserIdIs(user.getUuid());
@@ -240,16 +244,21 @@ class UserServiceTest {
         @DisplayName("Should update existing user successfully")
         void updateUser_Success() {
             UserUpdateRequest request = createSampleUpdateRequest();
-            User existingUser = createSampleUser("old_user", "old@example.com");
-            User updatedUser = createSampleUser(request.username(), request.email());
+            User existingUser = createSampleUser();
+            UserProfileData profileData = createSampleUserProfileData();
 
             givenCurrentUserIdIs(existingUser.getUuid());
             givenUserExistsInRepo(existingUser);
-            givenUserUpdaterProcessesRequest(existingUser, request, updatedUser);
+            givenMapperConvertsToUserProfileData(request, profileData);
 
             userService.updateUser(request);
+            ArgumentCaptor<User> captor = ArgumentCaptor.forClass(User.class);
+            verify(userRepository).save(captor.capture());
+            User saved = captor.getValue();
 
-            verify(userRepository).save(updatedUser);
+            assertEquals(request.username(), saved.getUsername());
+            assertEquals(request.firstname(), saved.getFirstname());
+            assertEquals(request.lastname(), saved.getLastname());
         }
     }
 
@@ -260,7 +269,7 @@ class UserServiceTest {
         @Test
         @DisplayName("Should delete user when ID exists")
         void deleteUser_Success() {
-            User user = createSampleUser("to_delete", "del@example.com");
+            User user = createSampleUser();
 
             givenUserExistsInRepo(user);
 

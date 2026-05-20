@@ -2,13 +2,12 @@ package com.github.ezequielarroyo.domain.userservice.dtos;
 
 import lombok.Builder;
 
-import java.util.UUID;
 @Builder
-public record UserResponse(
-        UUID uuid,
+public record UserProfileData(
         String username,
         String firstname,
-        String lastName,
+        String lastname,
         String email,
         String avatar
-) {}
+) {
+}

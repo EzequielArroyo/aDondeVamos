@@ -1,5 +1,6 @@
 package com.github.ezequielarroyo.domain.userservice.entities;
 
+import com.github.ezequielarroyo.domain.userservice.dtos.UserProfileData;
 import jakarta.persistence.*;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -16,75 +17,59 @@ public class User {
     @Column(unique = true, nullable = false, updatable = false)
     private UUID uuid;
 
-    @Column(unique = true, nullable = false, updatable = false)
+    @Column(unique = true)
     private String username;
 
-    @Column(nullable = false)
-    private String name;
+    @Column
+    private String firstname;
 
-    @Column(nullable = false)
-    private String lastName;
+    @Column
+    private String lastname;
 
-    @Column(nullable = false, unique = true)
+    @Column(unique = true)
     private String email;
 
     private String avatar;
 
-    @Column
-    private Boolean isCompleted;
-
-    private User(String username, String name,String lastName, String email) {
+    private User(String username, String firstname, String lastname, String email, String avatar) {
         this.uuid = UUID.randomUUID();
         this.username = username;
-        this.name = name;
-        this.lastName = lastName;
+        this.firstname = firstname;
+        this.lastname = lastname;
         this.email = email;
-        this.avatar = null;
-        this.isCompleted = false;
+        this.avatar = avatar;
     }
-    public static User create(String username, String name, String lastName, String email){
-        return new User(username, name, lastName, email);
+    public static User create(String username, String name, String lastname, String email, String avatar) {
+        return new User(username, name, lastname, email, avatar);
+    }
+    public void update(UserProfileData request) {
+        this.changeUsername(request.username());
+        this.changeName(request.firstname());
+        this.changeLastName(request.lastname());
+        this.changeAvatar(request.avatar());
     }
 
     public void changeUsername(String username) {
-        if (username == null || username.isBlank()) {
-            throw new IllegalArgumentException("Username cannot be null or blank");
+        if(username != null && !username.isBlank()) {
+            this.username = username;
         }
-        this.username = username;
     }
 
     public void changeName(String name) {
-        if (name == null || name.isBlank()) {
-            throw new IllegalArgumentException("Name cannot be null or blank");
+        if(name != null && !name.isBlank()) {
+            this.firstname = name;
         }
-        this.name = name;
     }
 
-    public void changeLastName(String lastName) {
-        if (lastName == null || lastName.isBlank()) {
-            throw new IllegalArgumentException("LastName cannot be null or blank");
+    public void changeLastName(String lastname) {
+        if(lastname != null && !lastname.isBlank()) {
+            this.lastname = lastname;
         }
-        this.lastName = lastName;
-    }
-
-    public void changeEmail(String email) {
-        if (email == null || email.isBlank()) {
-            throw new IllegalArgumentException("Email cannot be null or blank");
-        }
-        this.email = email;
     }
 
     public void changeAvatar(String avatar) {
-        if (avatar == null || avatar.isBlank()) {
-            throw new IllegalArgumentException("Avatar cannot be null or blank");
+        if(avatar != null && !avatar.isBlank()) {
+            this.avatar = avatar;
         }
-        this.avatar = avatar;
-    }
-
-    public void markAsComplete(Boolean isCompleted) {
-        if (isCompleted == null) {
-            throw new IllegalArgumentException("IsCompleted cannot be null");
-        }
-        this.isCompleted = isCompleted;
     }
 }
