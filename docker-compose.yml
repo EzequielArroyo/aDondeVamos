@@ -1,0 +1,16 @@
+services:
+  adondevamos-db:
+    image: mysql:8.0
+    container_name: adondevamos-db
+
+    environment:
+      MYSQL_ROOT_PASSWORD: 123456
+      MYSQL_PASSWORD: 123456
+
+    ports:
+      - "3306:3306"
+    volumes:
+      - adondevamos-db:/var/lib/mysql
+
+volumes:
+  adondevamos-db:
