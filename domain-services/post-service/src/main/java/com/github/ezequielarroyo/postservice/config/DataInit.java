@@ -18,11 +18,14 @@ public class DataInit implements CommandLineRunner {
 
     @Override
     public void run(String ...args){
-        UUID userId = UUID.randomUUID();
-        User user = User.create(userId, "testuser", "https://example.com/avatar.png");
-        userRepository.save(user);
-        System.out.println("Sample user created with ID: " + userId);
-        System.out.println("Fecha: " + LocalDateTime.now());
-        System.out.println("Data initialization logic goes here.");
+        if(userRepository.count()==0){
+            UUID userId = UUID.randomUUID();
+            User user = User.create(userId, "testuser", "https://example.com/avatar.png");
+            userRepository.save(user);
+            System.out.println("Sample user created with ID: " + userId);
+            System.out.println("Fecha: " + LocalDateTime.now());
+            System.out.println("Data initialization logic goes here.");
+        }
+
     }
 }
