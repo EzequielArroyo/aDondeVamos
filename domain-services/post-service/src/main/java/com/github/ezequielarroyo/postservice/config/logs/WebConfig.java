@@ -1,4 +1,4 @@
-package com.github.ezequielarroyo.postservice.config;
+package com.github.ezequielarroyo.postservice.config.logs;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Configuration;
