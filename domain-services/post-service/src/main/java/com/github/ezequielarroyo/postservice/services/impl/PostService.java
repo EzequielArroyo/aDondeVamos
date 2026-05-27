@@ -10,6 +10,7 @@ import com.github.ezequielarroyo.postservice.services.IPostService;
 import com.github.ezequielarroyo.postservice.utils.PostMapper;
 import com.github.ezequielarroyo.postservice.utils.user.ICurrentUserResolver;
 import jakarta.persistence.EntityNotFoundException;
+import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -18,16 +19,11 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.UUID;
 
 @Service
+@RequiredArgsConstructor
 public class PostService implements IPostService {
     private final IPostRepository postRepository;
     private final ICurrentUserResolver currentUserResolver;
     private final PostMapper postMapper;
-
-    public PostService(IPostRepository postRepository, ICurrentUserResolver userFacade, PostMapper postMapper) {
-        this.postRepository = postRepository;
-        this.currentUserResolver = userFacade;
-        this.postMapper = postMapper;
-    }
 
     @Override
     public PostResponse createPost(PostCreateRequest request) {
