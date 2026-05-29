@@ -17,15 +17,15 @@ public class Participant {
     private Post post;
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
-    private User user;
+    private UserSnapshot user;
     @CreationTimestamp
     private Instant joinedAt;
 
-    private Participant(Post post, User user) {
+    private Participant(Post post, UserSnapshot user) {
         this.post = post;
         this.user = user;
     }
-    public static Participant create(Post post, User user) {
+    public static Participant create(Post post, UserSnapshot user) {
         return new Participant(post, user);
     }
 }
