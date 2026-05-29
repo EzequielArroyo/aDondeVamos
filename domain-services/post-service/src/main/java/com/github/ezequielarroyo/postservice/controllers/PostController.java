@@ -15,11 +15,11 @@ import java.util.List;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/posts")
-public class postController {
+@RequestMapping("/api/v1/posts")
+public class PostController {
     private final IPostService postService;
 
-    public postController(IPostService postService) {
+    public PostController(IPostService postService) {
         this.postService = postService;
     }
     @GetMapping(value = "/ping")
