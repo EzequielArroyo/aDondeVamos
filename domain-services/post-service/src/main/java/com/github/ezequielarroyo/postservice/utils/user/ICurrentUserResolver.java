@@ -1,7 +1,7 @@
 package com.github.ezequielarroyo.postservice.utils.user;
 
-import com.github.ezequielarroyo.postservice.entities.User;
+import com.github.ezequielarroyo.postservice.entities.UserSnapshot;
 
 public interface ICurrentUserResolver {
-    User getCurrentUser();
+    UserSnapshot getCurrentUser();
 }

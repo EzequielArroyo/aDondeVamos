@@ -4,7 +4,7 @@ import com.github.ezequielarroyo.postservice.dtos.input.PostCreateRequest;
 import com.github.ezequielarroyo.postservice.dtos.input.PostUpdateRequest;
 import com.github.ezequielarroyo.postservice.dtos.output.PostResponse;
 import com.github.ezequielarroyo.postservice.entities.Post;
-import com.github.ezequielarroyo.postservice.entities.User;
+import com.github.ezequielarroyo.postservice.entities.UserSnapshot;
 import com.github.ezequielarroyo.postservice.repositories.IPostRepository;
 import com.github.ezequielarroyo.postservice.services.IPostService;
 import com.github.ezequielarroyo.postservice.utils.PostMapper;
@@ -29,7 +29,7 @@ public class PostService implements IPostService {
 
     @Override
     public PostResponse createPost(PostCreateRequest request) {
-        User owner = currentUserResolver.getCurrentUser();
+        UserSnapshot owner = currentUserResolver.getCurrentUser();
         log.debug("Creating post for user: {}", owner.getUuid());
 
         Post post = Post.create(
@@ -60,7 +60,7 @@ public class PostService implements IPostService {
     @Transactional
     public void joinPost(UUID postUuid) {
         Post post = this.getPostByUuid(postUuid);
-        User user = currentUserResolver.getCurrentUser();
+        UserSnapshot user = currentUserResolver.getCurrentUser();
         log.debug("Joining user with uuid: {} to post with uuid: {}", user.getUuid(), postUuid);
         post.addParticipant(user);
         postRepository.save(post);
@@ -70,7 +70,7 @@ public class PostService implements IPostService {
     @Transactional
     public void leavePost(UUID postUuid) {
         Post post = this.getPostByUuid(postUuid);
-        User user = currentUserResolver.getCurrentUser();
+        UserSnapshot user = currentUserResolver.getCurrentUser();
         log.debug("Leaving user with uuid: {} from post with uuid: {}", user.getUuid(), postUuid);
         post.removeParticipant(user);
         postRepository.save(post);

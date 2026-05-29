@@ -32,7 +32,7 @@ public class Post {
     @Enumerated(EnumType.STRING) @Column(nullable = false)
     private PostStatus status;
     @ManyToOne(fetch = FetchType.LAZY) @JoinColumn(name = "owner_id", referencedColumnName = "id", nullable = false)
-    private User owner;
+    private UserSnapshot owner;
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Participant> participants;
     @CreationTimestamp
@@ -41,7 +41,7 @@ public class Post {
     private Instant updatedAt;
     private Instant deletedAt;
 
-    private Post(String title, Location location, LocalDateTime activityDate, Integer maxParticipants,User owner) {
+    private Post(String title, Location location, LocalDateTime activityDate, Integer maxParticipants, UserSnapshot owner) {
         this.active = true;
         this.uuid = UUID.randomUUID();
         this.status = PostStatus.OPEN;
@@ -52,7 +52,7 @@ public class Post {
         this.maxParticipants = maxParticipants;
         this.owner = owner;
     }
-    public static Post create(String title, Location location, LocalDateTime activityDate, Integer maxParticipants, User owner) {
+    public static Post create(String title, Location location, LocalDateTime activityDate, Integer maxParticipants, UserSnapshot owner) {
         return new Post(title, location, activityDate, maxParticipants, owner);
     }
     public void update(String title, Location location, LocalDateTime activityDate, Integer maxParticipants) {
@@ -70,14 +70,14 @@ public class Post {
             this.updateStatus();
         }
     }
-    public void addParticipant(User user) {
+    public void addParticipant(UserSnapshot user) {
         this.validatePostIsInteractable();
         this.validateUserCanJoin(user);
         Participant p = Participant.create(this, user);
         this.participants.add(p);
         this.updateStatus();
     }
-    public void removeParticipant(User user) {
+    public void removeParticipant(UserSnapshot user) {
         this.validatePostIsInteractable();
         boolean removed = this.participants.removeIf(p ->
                 p.getUser().getUuid().equals(user.getUuid())
@@ -100,7 +100,7 @@ public class Post {
             throw new IllegalStateException("The post cannot be modified, the post is finished or cancelled");
         }
     }
-    private void validateUserCanJoin(User user){
+    private void validateUserCanJoin(UserSnapshot user){
         if(userAlreadyInPost(user)){
             throw new IllegalStateException("User already in post");
         }
@@ -118,7 +118,7 @@ public class Post {
     private boolean hasClosed() {
         return this.status == PostStatus.CANCELLED;
     }
-    private boolean userAlreadyInPost(User user) {
+    private boolean userAlreadyInPost(UserSnapshot user) {
         return this.participants.stream().anyMatch(p -> p.getUser().getUuid().equals(user.getUuid()));
     }
     private void updateStatus() {
