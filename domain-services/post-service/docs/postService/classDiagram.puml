@@ -7,7 +7,7 @@ Class Post{
 -LocalDateTime activityDate
 -Integer maxParticipants
 -PostStatus status
--User owner
+-UsUserSnapshoter owner
 -List<Participant> participants
 -Instant createdAt
 -Instant updatedAt
@@ -19,11 +19,11 @@ Class Participant{
 -Integer id
 -Boolean active
 -Post post
--user user
+-user UserSnapshot
 -Instant joinedAt
 -Instant leftAt
 }
-Class User{
+Class UserSnapshot{
 -UUID id
 -username
 -avatar
@@ -35,8 +35,8 @@ CANCELLED
 FINISHED
 }
 Post "1" -- "*" Participant : has
-Post "*" -- "1" User : created_by
-Participant "*" -- "1" User : is_user
+Post "*" -- "1" UserSnapshot : created_by
+Participant "*" -- "1" UserSnapshot : is_user
 Post --* PostStatus
 
 @enduml
