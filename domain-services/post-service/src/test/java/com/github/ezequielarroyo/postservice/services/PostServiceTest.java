@@ -6,7 +6,7 @@ import com.github.ezequielarroyo.postservice.dtos.output.PostResponse;
 import com.github.ezequielarroyo.postservice.entities.Location;
 import com.github.ezequielarroyo.postservice.entities.Post;
 import com.github.ezequielarroyo.postservice.entities.PostStatus;
-import com.github.ezequielarroyo.postservice.entities.User;
+import com.github.ezequielarroyo.postservice.entities.UserSnapshot;
 import com.github.ezequielarroyo.postservice.repositories.IPostRepository;
 import com.github.ezequielarroyo.postservice.services.impl.PostService;
 import com.github.ezequielarroyo.postservice.utils.PostMapper;
@@ -38,7 +38,7 @@ class PostServiceTest {
 
     @InjectMocks private PostService postService;
 
-    private User owner;
+    private UserSnapshot owner;
     private Post savedPost;
 
     @BeforeEach
@@ -102,7 +102,7 @@ class PostServiceTest {
     @DisplayName("Join Post Tests")
     class JoinPostTests {
 
-        private User participant;
+        private UserSnapshot participant;
 
         @BeforeEach
         void setUp() {
@@ -179,7 +179,7 @@ class PostServiceTest {
     @DisplayName("Leave Post Tests")
     class LeavePostTests {
 
-        private User runner;
+        private UserSnapshot runner;
 
         @BeforeEach
         void setUp() {
@@ -356,11 +356,11 @@ class PostServiceTest {
     }
 
     //HELPERS
-    private User createUser(String username) {
-        return User.create(UUID.randomUUID(),username, "img.png");
+    private UserSnapshot createUser(String username) {
+        return UserSnapshot.create(UUID.randomUUID(),username, "img.png");
     }
 
-    private Post createPost(User owner) {
+    private Post createPost(UserSnapshot owner) {
         Post post = Post.create(
                 "Go to the park",
                 Location.create(82.3, 90.0),
@@ -372,7 +372,7 @@ class PostServiceTest {
         return post;
     }
 
-    private void givenUserIsAuthenticated(User currentUser) {
+    private void givenUserIsAuthenticated(UserSnapshot currentUser) {
         when(currentUserResolver.getCurrentUser())
                 .thenReturn(currentUser);
     }
